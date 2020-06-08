@@ -15,14 +15,14 @@ const tradeTableListener = async (eventFunction) => {
     await instance.start();
   
     instance.addTrigger({
-      name: 'monitoring all statments',
+      name: 'monitoring changes to trade_table',
       expression: 'cryptodb.trade_table', // listen to TEST database !!!
       statement: MySQLEvents.STATEMENTS.ALL, // you can choose only insert for example MySQLEvents.STATEMENTS.INSERT, but here we are choosing everything
       onEvent: e => {
         eventFunction()
         console.log(e);
         console.log('event happens')
-        spinner.succeed('👽 _EVENT_ 👽');
+        spinner.succeed('EVENT');
         spinner.start();
       }
     });

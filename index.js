@@ -8,6 +8,8 @@ const addTradeProfits = sqlApi.addTradeProfits;
 
 connectSql();
 
+const tickerMap = require('./tickerMap');
+
 
 const express = require('express');
 const bodyParser = require('body-parser');
@@ -17,15 +19,15 @@ app.use(bodyParser.json());
 app.use(cors())
 const PORT = 5000;
 
-// CONTINOUSLY ADD TRADE PROFITS EVERY MINUTE
+// CONTINOUSLY ADD TRADE PROFITS EVERY 5 MINUTES
+var minutes = 5;
+var interval = minutes * 60 * 1000;
+setInterval(() => {
+    addTradeProfits()
+}, interval)
 
 
-// SET UP ROUTER
-
-
-// FUNCTIONALITIES
-// get trades, add trade, remove trade, 
-// get trade profits
+// ROUTER
 
 app.get('/api/trades', (req, res) => {
     console.log('GET /api/trades hit');
@@ -34,7 +36,7 @@ app.get('/api/trades', (req, res) => {
 
 app.post('/api/trades', (req, res) => {
     console.log('POST /api/trades hit');
-    addTrade(req.body.ticker, req.body.quantity, (result) => res.send(result));
+    addTrade(tickerMap[req.body.ticker], req.body.quantity, (result) => res.send(result));
 })
 
 app.delete('/api/trades', (req, res) => {

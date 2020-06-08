@@ -137,7 +137,7 @@ const addTradeProfits = async () => {
 const tradeTableListener = require('./tradeTableListener');
 const ora = require('ora'); // cool spinner
 const spinner = ora({
-    text: '🛸 Waiting for database events... 🛸',
+    text: 'Listening for changes to trade_table...',
     color: 'blue',
     spinner: 'dots2'
   });
