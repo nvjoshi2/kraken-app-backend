@@ -39,9 +39,9 @@ app.post('/api/trades', (req, res) => {
     addTrade(tickerMap[req.body.ticker], req.body.quantity, (result) => res.send(result));
 })
 
-app.delete('/api/trades', (req, res) => {
+app.delete('/api/trades/:tradeId', (req, res) => {
     console.log('POST /api/trades hit');
-    deleteTrade(req.body.tradeId, (result) => res.send(result))
+    deleteTrade(req.params.tradeId, (result) => res.send(result))
 })
 
 app.get('/api/tradeProfits/:tradeId', (req, res) => {

@@ -1,3 +1,16 @@
+const dotenv = require('dotenv');
+const assert = require('assert');
+
+dotenv.config();
+
+const {
+    SQL_HOST,
+    SQL_USER,
+    SQL_PASSWORD,
+    SQL_DB,
+} = process.env;
+
+
 const krakenApi = require('./kraken-api');
 const mysql = require('mysql');
 const getTickerPrices = krakenApi.getTickerPrices;
@@ -7,16 +20,20 @@ var trades = [];
 var tickers = [];
 
 var connection = mysql.createConnection({
-    host     : 'localhost',
-    user     : 'root',
-    password : 'Nvj13130!',
-    database : 'CryptoDb',
+    host : SQL_HOST,
+    user : SQL_USER,
+    password: SQL_PASSWORD,
+    database : SQL_DB,
     multipleStatements: true
   });
 
 const connectSql = () => {
     connection.connect((err) => {
-        if (err) throw err;
+        if (err) {
+            console.log('COULD NOT CONNECT TO SQL')
+            console.log(err)
+            return;
+        }
         console.log('Connected to mySql database')
         setLocalVars();
     
@@ -29,7 +46,10 @@ const promiseQuery = util.promisify(connection.query).bind(connection);
 const setLocalVars = () => {
     var sql = 'SELECT TradeId, Ticker, BoughtPrice, Quantity FROM trade_table'
     connection.query(sql, (err, result) => {
-        if (err) throw err;
+        if (err) {
+            console.log(err)
+            return;
+        }
         trades = result;
         console.log('trades set');
         console.log(trades);
@@ -73,7 +93,10 @@ const addTrade = async (ticker, quantity, callback) => {
     const dtInt = dt.getTime();
     var query = `INSERT INTO trade_table (Ticker, DateTime, BoughtPrice, Quantity) VALUES ('${ticker}', ${dtInt}, ${boughtPrice}, ${quantity})`
     connection.query(query, (err, result) => {
-        if (err) throw err;
+        if (err) {
+            console.log(err)
+            return;
+        }
         callback(result);
         console.log('trade added');
     })
@@ -83,7 +106,11 @@ const deleteTrade = async (tradeId, callback) => {
     var sql = `DELETE from trade_table WHERE TradeId=${tradeId}; DELETE FROM trade_profits WHERE tradeId=${tradeId}`;
     console.log(sql)
     connection.query(sql, (err, result) => {
-        if (err) throw err;
+        if (err) {
+            console.log(err)
+            return;
+        }
+        result.tradeId = tradeId;
         console.log(`trade ${tradeId} deleted`)
         callback(result)
     })
@@ -105,7 +132,11 @@ const getTradeProfits = async (tradeId, callback) => {
     var sql = `SELECT DateTime, Profit from trade_profits WHERE tradeId=${tradeId}`;
     // var tradeProfits = await promiseQuery(sql);
     connection.query(sql, (err, result) => {
-        if (err) throw err;
+        if (err) {
+            console.log(err)
+            return;
+        }
+        // var mappedResult = result.map((tradeProfit) => [tradeProfit.DateTime, tradeProfit.Profit])
         callback(result)
     })
     
@@ -124,7 +155,10 @@ const addTradeProfits = async () => {
     })
     connection.query(sql, [values], (err) => {
         console.log('Profits Added')
-        if (err) throw err;
+        if (err) {
+            console.log(err)
+            return;
+        }
     })
 }
 
